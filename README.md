@@ -3,10 +3,13 @@
 Partido de pádel en 3D para el celular o la compu: vos y tu compañero contra la computadora, en una cancha reglamentaria de césped azul y paredes de vidrio.
 
 ## Jugar
+En el celular o en la compu: **https://sebacalde-dotcom.github.io/padel/**. Desde el celular se puede instalar como app.
+
+Para correrlo en tu compu:
 1. `node server.mjs`
 2. Abrí http://localhost:5173
 
-Para probarlo en el celular, corré `node server.mjs --red` y abrí la dirección que muestra (el celular tiene que estar en la misma Wi-Fi). Para instalarlo como app hace falta publicarlo con https, por ejemplo con GitHub Pages.
+Con `node server.mjs --red` también se abre desde el celular, si está en la misma Wi-Fi.
 
 ## Controles
 | | Celular | Compu |

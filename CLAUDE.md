@@ -8,6 +8,12 @@ Juego de pádel en 3D que se instala como PWA. Es un proyecto aparte: no tiene n
 - No hay build ni dependencias: son módulos ES, y Three.js 0.170 se carga desde jsDelivr con un import map (en `index.html`).
 - Con `?demo` juegan los cuatro solos; `?demo&warp=8` además adelanta 8 s de partido (sirve para capturas).
 
+## Publicación
+- Está en GitHub Pages: https://sebacalde-dotcom.github.io/padel/ (repo público `sebacalde-dotcom/padel`, rama `main`, raíz).
+- Lo que se sube a `main` queda publicado en uno o dos minutos, así que no hay que subir cosas a medio hacer.
+- `.nojekyll` hace que Pages publique los archivos tal cual, sin procesarlos.
+- Al cambiar archivos del juego conviene subir la versión de `CACHE` en `sw.js`, para que el modo sin conexión no se quede con la versión vieja.
+
 ## Estructura
 - `src/physics.js`, `shots.js`, `rules.js`, `ai.js` y `game.js` tienen la lógica. **No importan Three.js ni usan el DOM**, así `test/sim.mjs` los prueba con Node. Mantenerlo así.
 - `src/view/*` es lo que se dibuja: cancha, jugadores y pelota. `src/main.js` une todo con `input.js`, `hud.js` y `sound.js`.
