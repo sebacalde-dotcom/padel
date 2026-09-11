@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Ícono de Pádel 3D</title>
+<!-- Se captura con Edge headless en 512 y 192 px: ver CLAUDE.md -->
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #070b18; }
+  svg { display: block; width: 100vmin; height: 100vmin; }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="36%" r="75%">
+      <stop offset="0" stop-color="#24428a"/><stop offset="1" stop-color="#070b18"/>
+    </radialGradient>
+    <radialGradient id="ball" cx="36%" cy="32%" r="70%">
+      <stop offset="0" stop-color="#f6ffb0"/><stop offset=".55" stop-color="#d4ff3f"/><stop offset="1" stop-color="#8fae16"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <!-- Cancha en perspectiva, como se ve en el juego -->
+  <polygon points="170,130 342,130 412,400 100,400" fill="#1d5cc2"/>
+  <g stroke="#f2f5fa" stroke-width="5" stroke-linecap="round">
+    <line x1="160" y1="170" x2="352" y2="170"/>
+    <line x1="114" y1="345" x2="398" y2="345"/>
+    <line x1="256" y1="170" x2="256" y2="345"/>
+  </g>
+  <polygon points="139,250 373,250 373,236 139,236" fill="#0c111c" opacity=".85"/>
+  <line x1="139" y1="236" x2="373" y2="236" stroke="#ffffff" stroke-width="5"/>
+  <polygon points="170,130 342,130 412,400 100,400" fill="none" stroke="#bff7ec" stroke-width="7" stroke-linejoin="round"/>
+  <!-- Pelota con estela -->
+  <circle cx="300" cy="206" r="15" fill="#e8ff6a" opacity=".22"/>
+  <circle cx="326" cy="178" r="22" fill="#e8ff6a" opacity=".38"/>
+  <circle cx="362" cy="140" r="34" fill="url(#ball)"/>
+  <path d="M338 122 q24 16 50 6" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity=".75"/>
+</svg>
+</body>
+</html>

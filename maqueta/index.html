@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pádel 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Fredoka:wght@600;700&family=Poppins:wght@600;700&family=Press+Start+2P&display=block" rel="stylesheet">
+<link rel="stylesheet" href="hud.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<script>
+  // ?estilo=realista|caricatura|pixel|plano  ·  ?sinmarco saca el teléfono
+  const q = new URLSearchParams(location.search);
+  window.ESTILO = q.get('estilo') || 'realista';
+  document.body.classList.add(window.ESTILO);
+  if (q.has('sinmarco')) document.body.classList.add('bare');
+</script>
+<div class="phone">
+  <div class="screen" id="screen">
+    <canvas id="c"></canvas>
+    <div class="hud">
+      <div class="score panel">
+        <div class="row"><i class="dot off"></i><b class="team">TU EQUIPO</b><b class="set">6</b><b class="set cur">3</b><b class="pts">30</b></div>
+        <div class="row"><i class="dot"></i><b class="team">RIVALES</b><b class="set">4</b><b class="set cur">2</b><b class="pts">15</b></div>
+      </div>
+      <div class="chip panel">2º SET</div>
+      <div class="pause panel"></div>
+      <div class="stick"><div class="knob"></div></div>
+      <div class="btn panel b1">GLOBO</div>
+      <div class="btn panel b2">REMATE</div>
+      <div class="btn panel b3">DEJADA</div>
+      <div class="btn main">GOLPE</div>
+      <div class="tag" id="tag">TÚ</div>
+    </div>
+    <i class="punch"></i>
+  </div>
+</div>
+<script src="court.js"></script>
+<script src="walls.js"></script>
+<script src="arena.js"></script>
+<script src="players.js"></script>
+<script src="styles.js"></script>
+<script src="main.js"></script>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { OutlineEffect } from 'three/addons/effects/OutlineEffect.js';
+startGame(THREE, RoomEnvironment, OutlineEffect);
+</script>
+</body>
+</html>

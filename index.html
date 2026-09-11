@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#070b18">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Pádel 3D</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div class="hud">
+  <div class="score panel">
+    <div class="row"><i class="dot" id="serve0"></i><b class="team">TU EQUIPO</b><b class="games" id="games0">0</b><b class="pts" id="pts0">0</b></div>
+    <div class="row"><i class="dot" id="serve1"></i><b class="team">RIVALES</b><b class="games" id="games1">0</b><b class="pts" id="pts1">0</b></div>
+  </div>
+  <div class="chip panel" id="chip">SET 1</div>
+  <button class="pause panel" id="pauseBtn" aria-label="Pausa"></button>
+  <div class="msg" id="msg"><b id="msgTitle"></b><span id="msgSub"></span></div>
+  <div class="hint" id="hint" hidden></div>
+  <div class="tag" id="tag" hidden>TÚ</div>
+
+  <div class="stick-zone" id="stickZone"></div>
+  <div class="stick" id="stick"><div class="knob" id="knob"></div></div>
+  <button class="btn panel b1" data-shot="globo">GLOBO</button>
+  <button class="btn panel b2" data-shot="remate">REMATE</button>
+  <button class="btn panel b3" data-shot="dejada">DEJADA</button>
+  <button class="btn main" data-shot="golpe">GOLPE</button>
+  <p class="keys">Flechas o WASD: moverte · J o espacio: golpe · K: globo · L: remate · I: dejada · P: pausa</p>
+</div>
+
+<section class="overlay" id="startScreen">
+  <div class="card">
+    <h1>PÁDEL <span>3D</span></h1>
+    <p>Un set a 6 games con punto de oro. Jugás con la remera naranja, del lado izquierdo de tu campo; tu compañero cubre el derecho.</p>
+    <ul class="how">
+      <li><b>Golpe:</b> drive o volea · <b>Globo:</b> alto y al fondo</li>
+      <li><b>Remate:</b> con la pelota alta · <b>Dejada:</b> corta, cerca de la red</li>
+      <li>Apretá el golpe justo antes de que te llegue la pelota. Con el joystick elegís hacia qué lado va.</li>
+    </ul>
+    <button class="cta" id="playBtn">JUGAR</button>
+  </div>
+</section>
+<section class="overlay" id="pauseScreen" hidden>
+  <div class="card">
+    <h2>Pausa</h2>
+    <button class="cta" id="resumeBtn">SEGUIR</button>
+    <button class="ghost" id="restartBtn">Empezar de nuevo</button>
+  </div>
+</section>
+<section class="overlay" id="endScreen" hidden>
+  <div class="card">
+    <h2 id="endTitle"></h2>
+    <p class="final" id="endScore"></p>
+    <button class="cta" id="againBtn">JUGAR DE NUEVO</button>
+  </div>
+</section>
+<div class="rotate" id="rotate" hidden>Girá el teléfono para jugar</div>
+<pre id="errors" hidden></pre>
+
+<script>
+  // Si algo falla, se ve en pantalla (y queda en la página para las pruebas automáticas)
+  function showError(msg) { const el = document.getElementById('errors'); el.hidden = false; el.textContent += msg + '\n'; }
+  addEventListener('error', e => showError(e.message || String(e.error)));
+  addEventListener('unhandledrejection', e => showError(String(e.reason)));
+</script>
+<script type="module" src="src/main.js" onerror="showError('No se pudo cargar src/main.js')"></script>
+</body>
+</html>
