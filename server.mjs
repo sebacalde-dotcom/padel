@@ -28,7 +28,7 @@ createServer(async (req, res) => {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' }).end('No encontrado');
   }
 }).listen(PORT, LAN ? '0.0.0.0' : '127.0.0.1', () => {
-  console.log(`Pádel 3D en http://localhost:${PORT}`);
+  console.log(`Padel Park en http://localhost:${PORT}`);
   if (LAN) {
     for (const nets of Object.values(networkInterfaces())) {
       for (const n of nets ?? []) if (n.family === 'IPv4' && !n.internal) console.log(`  desde el celular: http://${n.address}:${PORT}`);

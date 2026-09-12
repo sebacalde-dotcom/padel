@@ -1,5 +1,8 @@
 node_modules/
 .claude/settings.local.json
+
+# Fotos de referencia de los jugadores: nunca se publican
+fotos/
 *.log
 .DS_Store
 Thumbs.db

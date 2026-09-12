@@ -1,5 +1,14 @@
 // Jugadores low-poly articulados y sus animaciones: esperar, correr y cada golpe.
+// El cuerpo se arma con formas que siguen el contorno (torso de una pieza, hombros
+// y mangas que continúan el brazo). Los rasgos de la cara están en looks.js.
 import * as THREE from 'three';
+import { R as HEAD_R, addFace, addHair, addBeard, addGlasses, addCap, shirtTexture } from './looks.js';
+
+// Perfil de la remera, de la cintura al cuello: [radio, altura]
+const TORSO = [
+  [0, -0.11], [0.125, -0.11], [0.142, -0.02], [0.152, 0.12], [0.163, 0.28],
+  [0.175, 0.4], [0.18, 0.46], [0.168, 0.52], [0.132, 0.57], [0.082, 0.6], [0.058, 0.62], [0, 0.625],
+].map(([r, y]) => new THREE.Vector2(r, y));
 
 function makeRacket(color) {
   const shape = new THREE.Shape();
@@ -20,57 +29,101 @@ function makeRacket(color) {
   return r;
 }
 
-// o: { shirt, shorts, skin, hair, racket, band?, ring? }
-export function makePlayer(o) {
-  const mat = c => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75 });
-  const skin = mat(o.skin), shirt = mat(o.shirt), shorts = mat(o.shorts), shoe = mat(0xf2f2f2), sock = mat(0xffffff);
+// look: rasgos del jugador (src/roster.js).
+// gear: lo del equipo en la cancha { shirt, shorts, ring }. Sin remera de equipo usa la propia (tarjeta).
+export function makePlayer(look, gear = {}) {
+  const mat = (c, extra) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.75, ...extra });
+  const shirtColor = gear.shirt ?? look.shirt;
+  const skin = mat(look.skin);
+  const shirt = !gear.shirt && look.pattern
+    ? new THREE.MeshStandardMaterial({ map: shirtTexture(look.pattern, look.shirt), roughness: 0.8 })
+    : mat(shirtColor);
+  const trim = mat(new THREE.Color(shirtColor).multiplyScalar(0.75));
+  const shorts = mat(gear.shorts ?? 0x1b2130);
+  const sole = mat(0xf4f4f4), shoe = mat(0xe9edf3), sock = mat(0xffffff);
+
   const root = new THREE.Group();
   const grp = (parent, x, y, z) => { const g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; };
   const add = (parent, geo, m, x = 0, y = 0, z = 0) => { const me = new THREE.Mesh(geo, m); me.position.set(x, y, z); me.castShadow = true; parent.add(me); return me; };
-  const cap = (r, l) => new THREE.CapsuleGeometry(r, l, 4, 12);
-  const cyl = (a, b, h) => new THREE.CylinderGeometry(a, b, h, 14);
+  const cyl = (a, b, h, seg = 14) => new THREE.CylinderGeometry(a, b, h, seg);
+  const ball = (r, seg = 12) => new THREE.SphereGeometry(r, seg, Math.round(seg * 0.8));
 
   const hips = grp(root, 0, 0.95, 0);
-  add(hips, cyl(0.165, 0.19, 0.3), shorts, 0, -0.1, 0);
+  add(hips, cyl(0.15, 0.178, 0.34, 20), shorts, 0, -0.11, 0).scale.set(1.16, 1, 0.84);
+
   const leg = s => {
-    const hip = grp(hips, 0.095 * s, -0.06, 0);
-    add(hip, cap(0.07, 0.3), skin, 0, -0.22, 0);
+    const hip = grp(hips, 0.092 * s, -0.07, 0);
+    add(hip, cyl(0.072, 0.058, 0.4), skin, 0, -0.22, 0);
     const knee = grp(hip, 0, -0.44, 0);
-    add(knee, cap(0.056, 0.32), skin, 0, -0.22, 0);
-    add(knee, cyl(0.06, 0.058, 0.1), sock, 0, -0.37, 0);
-    const foot = add(knee, new THREE.BoxGeometry(0.11, 0.08, 0.27), shoe, 0, -0.45, 0.05);
+    add(knee, ball(0.058), skin);
+    add(knee, cyl(0.055, 0.044, 0.38), skin, 0, -0.2, 0);
+    add(knee, cyl(0.05, 0.048, 0.12, 12), sock, 0, -0.37, 0);
+    const foot = grp(knee, 0, -0.44, 0);
+    add(foot, new THREE.BoxGeometry(0.108, 0.04, 0.24), sole, 0, -0.025, 0.045);
+    add(foot, ball(0.075, 14), shoe, 0, 0.005, 0.03).scale.set(0.75, 0.72, 1.55);
     return { hip, knee, foot };
   };
+
   const spine = grp(hips, 0, 0.04, 0);
-  add(spine, cap(0.17, 0.3), shirt, 0, 0.3, 0).scale.set(1.28, 1, 0.78);
-  add(spine, cyl(0.05, 0.056, 0.12), skin, 0, 0.6, 0);
-  const head = add(spine, new THREE.SphereGeometry(0.11, 20, 16), skin, 0, 0.75, 0.01);
-  add(head, new THREE.SphereGeometry(0.117, 20, 10, 0, Math.PI * 2, 0, Math.PI * 0.5), mat(o.hair), 0, 0.012, -0.012);
-  if (o.band) add(head, new THREE.TorusGeometry(0.11, 0.017, 8, 28), mat(o.band), 0, 0.035, 0).rotation.x = Math.PI / 2;
+  add(spine, new THREE.LatheGeometry(TORSO, 26), shirt).scale.set(1.2, 1, 0.78);
+  add(spine, cyl(0.05, 0.058, 0.1), skin, 0, 0.6, 0);
+  const collar = add(spine, new THREE.TorusGeometry(0.064, 0.014, 8, 24), trim, 0, 0.585, 0);
+  collar.rotation.x = Math.PI / 2;
+  collar.scale.set(1.26, 0.95, 1);
+
+  const head = grp(spine, 0, 0.695, 0.012);
+  add(head, ball(HEAD_R, 26), skin).scale.set(1, 1.05, 0.98);
+  addFace(head, look);
+  addHair(head, look);
+  addBeard(head, look);
+  addGlasses(head, look);
+  addCap(head, look);
+
   const arm = s => {
-    const sh = grp(spine, 0.235 * s, 0.5, 0);
-    add(sh, new THREE.SphereGeometry(0.078, 14, 10), shirt);
-    add(sh, cyl(0.072, 0.064, 0.15), shirt, 0, -0.07, 0);
-    add(sh, cap(0.048, 0.22), skin, 0, -0.16, 0);
-    const el = grp(sh, 0, -0.31, 0);
-    add(el, cap(0.041, 0.2), skin, 0, -0.14, 0);
+    // El brazo sale del torso afinándose: nada sobresale como una pelota
+    const sh = grp(spine, 0.185 * s, 0.465, 0);
+    add(sh, ball(0.055, 14), shirt).scale.set(1, 1, 0.95);
+    add(sh, cyl(0.06, 0.05, 0.16), shirt, 0, -0.07, 0).scale.set(1, 1, 0.95);
+    add(sh, cyl(0.045, 0.039, 0.3, 12), skin, 0, -0.19, 0);
+    const el = grp(sh, 0, -0.33, 0);
+    add(el, ball(0.04, 10), skin);
+    add(el, cyl(0.038, 0.032, 0.26, 12), skin, 0, -0.14, 0);
     const hand = grp(el, 0, -0.29, 0);
-    add(hand, new THREE.SphereGeometry(0.05, 12, 10), skin);
+    add(hand, ball(0.045), skin).scale.set(1, 1.15, 0.65);
     return { sh, el, hand };
   };
+
   // Mira hacia +z, así que su derecha es -x
   const rLeg = leg(-1), lLeg = leg(1), rArm = arm(-1), lArm = arm(1);
-  rArm.hand.add(makeRacket(o.racket));
+  rArm.hand.add(makeRacket(look.racket ?? 0xd4ff3f));
 
-  if (o.ring) {
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0xd4ff3f, transparent: true, opacity: 0.9, depthWrite: false });
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.46, 0.56, 48), ringMat);
-    ring.rotation.x = -Math.PI / 2; ring.position.y = 0.012;
+  if (gear.ring) {
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.46, 0.56, 48), new THREE.MeshBasicMaterial({ color: 0xd4ff3f, transparent: true, opacity: 0.9, depthWrite: false }));
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.012;
     root.add(ring);
   }
 
   const joints = { spine, rSh: rArm.sh, rEl: rArm.el, rHand: rArm.hand, lSh: lArm.sh, lEl: lArm.el, rHip: rLeg.hip, rKnee: rLeg.knee, lHip: lLeg.hip, lKnee: lLeg.knee };
   return { root, hips, head, joints, rFoot: rLeg.foot, lFoot: lLeg.foot, phase: Math.random() * 6 };
+}
+
+export function disposePlayer(v) {
+  v.root.removeFromParent();
+  v.root.traverse(o => {
+    o.geometry?.dispose();
+    for (const m of [].concat(o.material ?? [])) { m.map?.dispose(); m.dispose(); }
+  });
+}
+
+// Parado derecho con los brazos al costado, para el retrato de la tarjeta
+export function posePortrait(v) {
+  const j = v.joints;
+  j.spine.rotation.set(0.04, 0, 0);
+  j.rSh.rotation.set(0.05, 0, -0.14); j.rEl.rotation.set(-0.25, 0, 0); j.rHand.rotation.set(0, 0, 0);
+  j.lSh.rotation.set(0.05, 0, 0.14); j.lEl.rotation.set(-0.25, 0, 0);
+  for (const k of ['rHip', 'lHip', 'rKnee', 'lKnee']) j[k].rotation.set(0, 0, 0);
+  v.hips.position.y = 0.97;
 }
 
 // Posición de espera: rodillas flexionadas y la pala adelante

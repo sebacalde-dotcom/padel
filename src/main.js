@@ -4,7 +4,10 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Game } from './game.js';
 import { predict, sideOf } from './physics.js';
 import { buildCourt } from './view/court.js';
-import { makePlayer, animatePlayer } from './view/players.js';
+import { makePlayer, animatePlayer, disposePlayer } from './view/players.js';
+import { renderPortraits } from './view/portraits.js';
+import { ROSTER, TEAM_KITS, byId, drawLineup } from './roster.js';
+import { Menu } from './menu.js';
 import { BallView } from './view/ball.js';
 import { Input } from './input.js';
 import { Hud } from './hud.js';
@@ -39,13 +42,19 @@ scene.add(sun);
 buildCourt(scene, renderer);
 
 const game = new Game({ demo });
-const LOOKS = [
-  { shirt: 0xff5b35, shorts: 0x161c2b, skin: 0xe2ae88, hair: 0x2a190f, racket: 0xd4ff3f, band: 0xffffff, ring: !demo },
-  { shirt: 0xff5b35, shorts: 0x161c2b, skin: 0xc58b60, hair: 0x120e0b, racket: 0x2f8cff },
-  { shirt: 0xf4f6fa, shorts: 0x0f1c3f, skin: 0xd8a07a, hair: 0x5b3b22, racket: 0xff3d7f },
-  { shirt: 0xf4f6fa, shorts: 0x0f1c3f, skin: 0x9f6d47, hair: 0x101010, racket: 0xffb21f, band: 0x1d5cc2 },
-];
-const views = LOOKS.map(look => { const v = makePlayer(look); scene.add(v.root); return v; });
+let views = [], lineup = [];
+
+// lineup: [vos, compañero, rival, rival], tomados de ROSTER
+function setLineup(players) {
+  lineup = players;
+  views.forEach(disposePlayer);
+  views = players.map((p, i) => {
+    const v = makePlayer(p.look, { ...TEAM_KITS[i < 2 ? 0 : 1], ring: i === 0 && !demo });
+    scene.add(v.root);
+    return v;
+  });
+  hud.names(players);
+}
 const ballView = new BallView(scene);
 
 const camera = new THREE.PerspectiveCamera(46, 1, 0.1, 200);
@@ -142,6 +151,7 @@ function pause() { if (running && !paused) { paused = true; hud.show('pause'); }
 function resume() { paused = false; hud.show(null); }
 function start() {
   sound.unlock();
+  game.restart();
   running = true;
   paused = false;
   hud.show(null);
@@ -153,19 +163,34 @@ function start() {
       .catch(() => { /* no todos los navegadores lo permiten */ });
   }
 }
+// Elegiste jugador: se sortean compañero y rivales y se muestran las parejas
+function choose(id) {
+  setLineup(drawLineup(id));
+  menu.vs(lineup, portraits);
+  hud.show('vs');
+}
 hud.on('playBtn', start);
+hud.on('changeBtn', () => hud.show('select'));
 hud.on('resumeBtn', resume);
-hud.on('restartBtn', () => { game.restart(); start(); });
-hud.on('againBtn', () => { game.restart(); start(); });
+hud.on('restartBtn', start);
+hud.on('againBtn', start);
+hud.on('menuBtn', () => { running = false; hud.show('select'); });
 hud.on('pauseBtn', () => (paused ? resume() : pause()));
 input.onPause = () => (paused ? resume() : pause());
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
 
+// ?equipo=fer,tincho,jochi,gato fija las parejas (vos, compañero, rivales); si no, se sortean
+const fixed = (params.get('equipo') ?? '').split(',').map(byId).filter(Boolean);
+setLineup(fixed.length === 4 ? fixed : drawLineup(ROSTER[Math.floor(Math.random() * ROSTER.length)].id));
+const portraits = renderPortraits(ROSTER);
+const menu = new Menu(ROSTER, portraits, choose);
 hud.score(game.score, game.serveTeam);
 if (demo) {
   hud.show(null);
   const warp = Number(params.get('warp')) || 0;
   for (let i = 0; i < warp * 60; i++) game.update(1 / 60, {});
+} else if (params.get('elegir')) {
+  choose(params.get('elegir'));   // ?elegir=fer abre directo la pantalla de parejas (para capturas)
 }
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

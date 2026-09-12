@@ -1,12 +1,14 @@
-# Pádel 3D
+# Padel Park
 
 Juego de pádel en 3D que se instala como PWA. Es un proyecto aparte: no tiene nada que ver con MisViajes.
+El juego se llama **Padel Park** (sin tilde, así lo eligió el usuario). La carpeta y el repo siguen llamándose `padel`, para no cambiar la dirección del sitio.
 
 ## Cómo correrlo
 - `node server.mjs` → http://localhost:5173. Con `--red` también se abre desde el celular en la misma Wi-Fi.
 - `node test/sim.mjs` juega partidos enteros sin pantalla y muestra estadísticas: puntos, golpes por punto y cómo termina cada punto. Correrlo siempre después de tocar la física, las reglas o la IA.
 - No hay build ni dependencias: son módulos ES, y Three.js 0.170 se carga desde jsDelivr con un import map (en `index.html`).
 - Con `?demo` juegan los cuatro solos; `?demo&warp=8` además adelanta 8 s de partido (sirve para capturas).
+- `?equipo=fer,tincho,jochi,gato` fija las parejas (vos, compañero, rivales) y `?elegir=fer` abre directo la pantalla de parejas.
 
 ## Publicación
 - Está en GitHub Pages: https://sebacalde-dotcom.github.io/padel/ (repo público `sebacalde-dotcom/padel`, rama `main`, raíz).
@@ -17,6 +19,12 @@ Juego de pádel en 3D que se instala como PWA. Es un proyecto aparte: no tiene n
 ## Estructura
 - `src/physics.js`, `shots.js`, `rules.js`, `ai.js` y `game.js` tienen la lógica. **No importan Three.js ni usan el DOM**, así `test/sim.mjs` los prueba con Node. Mantenerlo así.
 - `src/view/*` es lo que se dibuja: cancha, jugadores y pelota. `src/main.js` une todo con `input.js`, `hud.js` y `sound.js`.
+- Los jugadores son amigos del usuario:
+  - `src/roster.js` tiene el apodo y los rasgos de cada uno, y sortea las parejas.
+  - `src/view/looks.js` arma la cara, el pelo, la barba, los anteojos y la gorra.
+  - `src/view/portraits.js` saca los retratos de las tarjetas con el mismo modelo 3D.
+  - `src/menu.js` maneja las pantallas de elegir jugador y de parejas.
+- Las fotos de referencia de los amigos van en `fotos/`, que Git ignora, y nunca se suben porque el sitio es público. En el código sólo quedan rasgos.
 - `maqueta/` guarda la maqueta original con los 4 estilos gráficos (`index.html?estilo=...`). Se eligió el realista.
 - PWA: `sw.js` y `manifest.webmanifest`. Si se agregan archivos, sumarlos a `APP` en `sw.js` y subir la versión de `CACHE`.
 

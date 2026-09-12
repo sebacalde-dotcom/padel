@@ -1,10 +1,11 @@
 // Modo sin conexión: guarda la app (y Three.js la primera vez que se baja).
 // Primero intenta la red, así se ven los cambios; si no hay conexión usa lo guardado.
-const CACHE = 'padel-v1';
+const CACHE = 'padel-v3';
 const APP = [
   './', 'index.html', 'style.css', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   'src/main.js', 'src/game.js', 'src/physics.js', 'src/shots.js', 'src/rules.js', 'src/ai.js',
-  'src/input.js', 'src/hud.js', 'src/sound.js', 'src/view/court.js', 'src/view/players.js', 'src/view/ball.js',
+  'src/input.js', 'src/hud.js', 'src/sound.js', 'src/menu.js', 'src/roster.js',
+  'src/view/court.js', 'src/view/players.js', 'src/view/ball.js', 'src/view/looks.js', 'src/view/portraits.js',
 ];
 
 self.addEventListener('install', e => {

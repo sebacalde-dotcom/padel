@@ -1,4 +1,4 @@
-# Pádel 3D
+# Padel Park
 
 Partido de pádel en 3D para el celular o la compu: vos y tu compañero contra la computadora, en una cancha reglamentaria de césped azul y paredes de vidrio.
 

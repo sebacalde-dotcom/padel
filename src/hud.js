@@ -7,9 +7,16 @@ export class Hud {
     this.pts = [$('pts0'), $('pts1')];
     this.games = [$('games0'), $('games1')];
     this.serve = [$('serve0'), $('serve1')];
-    this.screens = { start: $('startScreen'), pause: $('pauseScreen'), end: $('endScreen') };
+    this.screens = { select: $('selectScreen'), vs: $('vsScreen'), pause: $('pauseScreen'), end: $('endScreen') };
     this.msgTimer = null;
     document.body.classList.toggle('touch', touch);
+  }
+
+  // Nombres de las parejas en el marcador
+  names(lineup) {
+    const pair = (a, b) => `${a.name} · ${b.name}`.toUpperCase();
+    $('team0').textContent = pair(lineup[0], lineup[1]);
+    $('team1').textContent = pair(lineup[2], lineup[3]);
   }
 
   score(s, serveTeam) {

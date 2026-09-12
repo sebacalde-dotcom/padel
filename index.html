@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Pádel 3D</title>
+<title>Padel Park</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -20,8 +20,8 @@
 
 <div class="hud">
   <div class="score panel">
-    <div class="row"><i class="dot" id="serve0"></i><b class="team">TU EQUIPO</b><b class="games" id="games0">0</b><b class="pts" id="pts0">0</b></div>
-    <div class="row"><i class="dot" id="serve1"></i><b class="team">RIVALES</b><b class="games" id="games1">0</b><b class="pts" id="pts1">0</b></div>
+    <div class="row"><i class="dot" id="serve0"></i><b class="team" id="team0">TU EQUIPO</b><b class="games" id="games0">0</b><b class="pts" id="pts0">0</b></div>
+    <div class="row"><i class="dot" id="serve1"></i><b class="team" id="team1">RIVALES</b><b class="games" id="games1">0</b><b class="pts" id="pts1">0</b></div>
   </div>
   <div class="chip panel" id="chip">SET 1</div>
   <button class="pause panel" id="pauseBtn" aria-label="Pausa"></button>
@@ -38,16 +38,26 @@
   <p class="keys">Flechas o WASD: moverte · J o espacio: golpe · K: globo · L: remate · I: dejada · P: pausa</p>
 </div>
 
-<section class="overlay" id="startScreen">
-  <div class="card">
-    <h1>PÁDEL <span>3D</span></h1>
-    <p>Un set a 6 games con punto de oro. Jugás con la remera naranja, del lado izquierdo de tu campo; tu compañero cubre el derecho.</p>
+<section class="overlay" id="selectScreen">
+  <div class="card wide">
+    <h1 class="small">PADEL <span>PARK</span></h1>
+    <p class="lead">Elegí tu jugador</p>
+    <div class="roster" id="roster"></div>
+  </div>
+</section>
+<section class="overlay" id="vsScreen" hidden>
+  <div class="card wide">
+    <div class="vs">
+      <div class="side"><span class="side-label">TU EQUIPO</span><div class="pair" id="pair0"></div></div>
+      <b class="versus">VS</b>
+      <div class="side"><span class="side-label">RIVALES</span><div class="pair" id="pair1"></div></div>
+    </div>
     <ul class="how">
-      <li><b>Golpe:</b> drive o volea · <b>Globo:</b> alto y al fondo</li>
-      <li><b>Remate:</b> con la pelota alta · <b>Dejada:</b> corta, cerca de la red</li>
-      <li>Apretá el golpe justo antes de que te llegue la pelota. Con el joystick elegís hacia qué lado va.</li>
+      <li>Un set a 6 games con punto de oro. Jugás del lado izquierdo de tu campo, con el anillo verde.</li>
+      <li><b>Golpe:</b> drive o volea · <b>Globo:</b> alto y al fondo · <b>Remate:</b> con la pelota alta · <b>Dejada:</b> corta</li>
+      <li>Apretá el golpe justo antes de que te llegue la pelota; con el joystick elegís hacia qué lado va.</li>
     </ul>
-    <button class="cta" id="playBtn">JUGAR</button>
+    <div class="actions"><button class="ghost" id="changeBtn">Cambiar</button><button class="cta" id="playBtn">¡A JUGAR!</button></div>
   </div>
 </section>
 <section class="overlay" id="pauseScreen" hidden>
@@ -61,7 +71,7 @@
   <div class="card">
     <h2 id="endTitle"></h2>
     <p class="final" id="endScore"></p>
-    <button class="cta" id="againBtn">JUGAR DE NUEVO</button>
+    <div class="actions"><button class="ghost" id="menuBtn">Elegir otros</button><button class="cta" id="againBtn">REVANCHA</button></div>
   </div>
 </section>
 <div class="rotate" id="rotate" hidden>Girá el teléfono para jugar</div>
